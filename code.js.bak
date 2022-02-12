@@ -363,7 +363,7 @@ function saveSlotGet(key, def) {
 	//alert(slotData);
 	if (typeof slotData != 'object' || slotData === null) slotData = slotDataInit();
 	
-	//alert(JSON.stringify(slotData));
+	alert(JSON.stringify(slotData));
 	
 	console.log(slotData)
 	let value = slotData[key];
