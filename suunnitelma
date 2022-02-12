@@ -1,0 +1,41 @@
+- Pieni naama ruutufunktiolla									Sytytä himmeisiin ruutuihin valo ruutu(x,y)-funktiolla
+
+- Pieni naama while-silmukalla				
+- Isompi hymiö while-silmukalla (liikuta oikella paikalleen)	Piirtäessä useita ruutuja on helpompi käyttää while-silmukkaa. Liikuta ruudut oikeille paikoilleen
+
+- Isompi hymiö for-silmukalla ()								For-silmukka on nopeammin kirjoitettava versio äskisestä while-silmukasta.  Anna silmukalle oikea X:n alku- ja loppuarvo ja muuta ruutu-funktion korkeutta)
+- Nenähymiö for-silmukalla, tällä kertaa osittain itse			Tälla kertaa kirjoita for-silmukka kokonaan itse!
+
+- Plus (kokonaan itse)										Läpäistävissä yhdellä for-silmukalla ja kahdella ruutu-funktiolla
+- Plus (iso, älä resetoi koodia)
+- Yhtälö (lisää ruutu-funktiot)								Lisää ruutu-funktiot. Läpäistävissä yhdellä for-silmukalla ja kahdella ruutu-funktiolla.
+- Laatikko (yksi sivu tehtynä)
+
+- vinoviiva
+- rasti
+
+- kivi
+- marmorilattia
+
+- kerrostalo
+- pylvässali
+- lankakori
+
+- portaat
+
+- pyramidi
+- vinoneliö
+
+
+
+Save Slot:
+- create new
+- default
+- arttu
+
+
+- automatically enlists as quest (starts from where the quest ended last time)
+- when player saves: quest gets reseted, progress moves to user
+
+- on new sessio
+

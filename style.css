@@ -1,0 +1,156 @@
+@media (min-width: 1300px) {
+    .container{
+        max-width: 1300px;
+    }
+}
+
+@media (min-height: 750px) {
+    .container{
+        max-height: 500px;
+    }
+}
+
+
+.card {
+	border-style: none;
+	border: 0px;
+}
+.card-body {
+	background-color: rgb(21, 21, 21);
+	color: white;
+}
+
+.card-header {
+	background-color: #272822;
+	
+		border: 3px;
+		border-bottom-style: solid;
+		border-color: #956307;
+}
+
+
+.tabi {
+	width: 100%;
+	min-height: 50px;
+	background-color: rgb(21, 21, 21) !important;
+	color: white;
+	
+	border-bottom-style: solid !important;
+	border-color: #956307 !important;
+	color: white !important;
+}
+
+#console-text {
+	color: orange;
+}
+
+body {
+	padding-top: 5px;
+	padding-right: 5px;
+}
+
+#canvas {
+	width: 100%;
+}
+
+/*.col-sm-12 {
+	height: 400px;
+}*/
+
+
+button {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+}
+
+hr {
+	height: 2px;
+	width: 80%;
+	color: white;
+	background-color: white;
+	margin: 0px;
+	padding: 0px;
+}
+		
+
+.jumbotron {
+	background-color: #1c1c1c;
+	padding-top: 30px;
+	padding-bottom: 30px;
+	top: 0px;
+	bottom: 0px;
+}
+
+/*.container {
+	background-color: rgb(40, 40, 40);
+}*/
+
+h1,h2,h3 {
+	font-family: 'Inconsolata', monospace !important;
+	font-size: 80px;
+	color: orange;
+	font-weight: 700;
+}
+
+h1 {
+	font-size: 80px;
+}
+h2 {
+	font-size: 30px;
+	font-weight: normal;
+}
+
+h3 {
+	font-size: 45px;
+	font-weight: normal;
+}
+
+
+body {
+	background-image: url("https://igno.cc/playfab/images/prism.png");
+	background-repeat: repeat;
+	background-size: 900px;
+	background-color: #282828;
+	font-family: Arial; /*'Inconsolata', monospace;*/
+}
+
+.no-gutters {
+  margin-right: 0;
+  margin-left: 0;
+
+  > .col,
+  > [class*="col-"] {
+    padding-right: 0;
+    padding-left: 0;
+  }
+}
+
+.ace_scrollbar {
+    overflow-x: hidden;
+	overflow-y: hidden;
+}
+
+
+
+.mission-level {
+	height: 30px !important;
+	width: 50px;
+	padding:0px;
+	margin:0px;
+	border: 1px;
+	border-style: solid;
+	border-color: #956307;
+	
+	font-family: Arial;
+	color: white;
+}
+
+
+
+
+.btn-dark {
+	border-color: rgb(21,21,21);
+	border-width: 1px;
+}
