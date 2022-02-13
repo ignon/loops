@@ -109,7 +109,7 @@ h3 {
 
 
 body {
-	background-image: url("prism.png");
+	background-image: url("https://igno.cc/playfab/images/prism.png");
 	background-repeat: repeat;
 	background-size: 900px;
 	background-color: #282828;

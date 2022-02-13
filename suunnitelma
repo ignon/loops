@@ -34,7 +34,7 @@ Save Slot:
 - arttu
 
 
-- automatically enlists as quest (starts from where the quest ended last time)
+- automatically enlists as default (starts from where the quest ended last time)
 - when player saves: quest gets reseted, progress moves to user
 
 - on new sessio

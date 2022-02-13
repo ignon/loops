@@ -6,28 +6,82 @@ var consoleText = "";
 var hint_count = 1;
 
 
-//var newSessionStarted = sessionStorage.getItem('doesThisExist?') == undefined;
-//sessionStorage.setItem('doesThisExist?', true);
+var saveslot = {
+	set: function(key, value) {
+			let slotData = localStorage.getItem(slotName);
+				slotData = JSON.parse(slotData);
+			
+			if (typeof slotData != 'object' || slotData === null) slotData = saveslot.init();
+			slotData[key] = value;
+			console.log('set;');
+			console.log(slotData)
+			localStorage.setItem(slotName, JSON.stringify(slotData));
+	},
+	get: function(key, def) {
+			let slotData = localStorage.getItem(slotName);
+				slotData = JSON.parse(slotData);
+			
 
-
-/*var missionIndex = localStorage.getItem("mission_index");
-if (missionIndex === undefined) missionIndex = 0;
-
-var missionLatestUnlocked = localStorage.getItem('mission_latest_unlocked');
-if (missionLatestUnlocked === undefined) missionLatestUnlocked = missionIndex;*/
-
-
-var slotName = sessionStorage.getItem('slotName');
-if (typeof slotName != 'string' || slotName === '') {
-	slotName = localStorage.getItem('latest_slot');
+			if (typeof slotData != 'object' || slotData === null) slotData = saveslot.init();
+			
+			//alert(JSON.stringify(slotData));
+			
+			console.log(slotData)
+			let value = slotData[key];
+			console.log('get;');
+			console.log(slotData);
+			if (value === undefined && def !== undefined) return def;
+			console.log(value);
+			return value;
+	},
+	init: function (slotData) {
+		console.log('saveslot_init');
+		return {
+			mission_index: 0,
+			mission_latest_unlocked: 0
+		};
+	}
 }
+
+var slotName = localStorage.getItem('slotName');
+
+
 
 if (typeof slotName != 'string' || slotName === '') slotName = "Default";
 
 console.log(slotName);
 
-var missionIndex = saveSlotGet('mission_index', 0);
-var missionLatestUnlocked = saveSlotGet('mission_latest_unlocked', 0);
+var missions = null;
+var missionIndex = saveslot.get('mission_index');
+var missionLatestUnlocked = saveslot.get('mission_latest_unlocked');
+
+var language = localStorage.getItem('language');
+if (language === undefined) language = 'en';
+changeLanguage(language, false)
+
+var tabCurrent = 'desc';
+
+
+function changeLanguage(lang) {
+	var reset = (missions !== null);
+	console.log('trying to change language to '+lang)
+	switch(lang) {
+		case 'fi':
+			language = 'fi';
+			missions = missions_fi;
+			break;
+		default:
+			language = 'en';
+			missions = missions_en;
+		break;
+	}
+	console.log('resetted language to: ' + language)
+	
+	localStorage.setItem('language', language);
+	if (reset) resetEverything();
+
+}
+
 console.log(missionIndex + ' ' + missionLatestUnlocked);
 
 
@@ -63,21 +117,24 @@ function missionGoto(dir) {
 		missionIndex = dir;
 	}
 	
-	console.log('change tab')
-	
-	localStorage.setItem("mission_index", missionIndex);
-	
 	if (missionIndex > missionLatestUnlocked) {
+		//GameAnalytics("addProgressionEvent", "Start", "edu", "loops_intro", "Mission"+(missionIndex+1).toString());
+		//GameAnalytics("addProgressionEvent", "Start", "edu", "loops_intro", "Mission"+(missionIndex+2).toString());
+		
 		missionLatestUnlocked = missionIndex;
-		localStorage.setItem("mission_latest_unlocked", missionLatestUnlocked);
+		//pfUpdateLatestMission(missionLatestUnlocked);
 	}
+	
+	saveslot.set("mission_index", missionIndex);
+	saveslot.set("mission_latest_unlocked", missionLatestUnlocked ) ;
 	
 	resetEverything();
 }
 
 function resetEverything() {
-	
+	missionIndex = Math.min(missionIndex, missions.length-1)
 	mission = missions[missionIndex];
+	
 	hint_count = (mission.hints && mission.hints.length > 0) ? 1 : 0;
 	
 	var example = mission.example;
@@ -110,7 +167,7 @@ function hintButtonsUpdate() {
 	$('.hint').each(function() {
 		this.style.visibility = "visible";
 		
-		var hint_index = this.dataset.order;
+		var hint_index = this.dataset.hint_index;
 		if (hint_index > hint_count || (mission.hints && mission.hints.length < hint_index)) {
 			this.style.visibility = 'hidden';
 		}
@@ -165,8 +222,8 @@ function runCode() {
 	var code = editor.getValue();
 	
 	var size = 7;
+	var draw_coordinates = (!mission.hide_coordinates);
 	size = (mission.size) ? mission.size : 7;
-	ruudukko(size);
 	
 	var func = mission.func;
 	for( var i = 1; typeof func == 'string'; i++) {
@@ -174,8 +231,10 @@ function runCode() {
 		else if (func == 'example_prev') func = missions[missionIndex-i].example;
 	}
 	
+	ruudukko(size, draw_coordinates);
 	execution_mode = EXECUTION_MODE.SHADOW;
 	func();
+	
 	
 	if (code == "") return;
 	
@@ -191,7 +250,7 @@ function runCode() {
 		changeTab('console');
 		return;
 	}
-	
+	console.log(_cell_count)
 	var outcomeDifferent = compareFunctions(userFunc, func);
 	if (outcomeDifferent) {
 		consolePrint('Some cells are still missing!');
@@ -200,53 +259,49 @@ function runCode() {
 		consoleClear();
 		consolePrint("Mission complete!");
 		changeTab('console');
-		buttonMode("done");
+		if (missionIndex < missions.length-1) buttonMode("done");
 	}
 }
 
 function consolePrint(msg) {
-	consoleText = consoleText + " " + msg;
+	consoleText = consoleText + " " + msg
+	
+	if (tabCurrent == 'console') {
+		var palkki = document.getElementById("alapalkki");
+		palkki.innerHTML = consoleText;
+	}
+	
 }
 
 function consoleClear() {
 	consoleText = "";
 }
 
-function changeTab(tab) {
-	console.log("change tab!")
+function changeTab(tab, dom) {
 	
 	var palkki = document.getElementById("alapalkki");
 	
 	var teksti = "";
 	switch(tab) {
 		case "console":
-			teksti = "Console";	
 			palkki.innerHTML = consoleText;
 			break;
 		case "desc":
-			teksti = "Description";
 			var desc = mission.desc;
-			desc = desc.replace('[t]', '<span>').replace('[/t]', '</span>')
-			
+			var slug = mission.slug;
 			palkki.innerHTML = desc;
 			break;
 		case "hint1":
-			teksti = "Hint 1";
-			palkki.innerHTML = mission.hints[0];
-			if (hint_count == 1) hint_count++;
-			hintButtonsUpdate();
-			break;
 		case "hint2":
-			teksti = "Hint 2";
-			palkki.innerHTML = mission.hints[1];
-			if (hint_count == 2) hint_count++;
-			hintButtonsUpdate();
-			break;
 		case "hint3":
-			teksti = "Hint 3";
-			palkki.innerHTML = mission.hints[2];
+			let hint_index = dom.dataset.hint_index;
+			palkki.innerHTML = mission.hints[hint_index-1];
+			if (hint_count == hint_index && hint_count < mission.hints.length ) hint_count++;
+			hintButtonsUpdate();
 			break;
 	}
+	
+	tabCurrent = tab;
 	
 	console.log(tab);
 	$('.tabi').each(function(i,nappi) {
@@ -255,6 +310,7 @@ function changeTab(tab) {
 	document.getElementById(tab).style.borderStyle = "solid";
 }
 
+/*
 function resetAllProgress() {
 	if (confirm("Are you sure you want to reset everything and start from the first level?")) {
 		if (confirm("You really sure about this?")) {
@@ -263,10 +319,10 @@ function resetAllProgress() {
 		}
 	}
 }
+*/
 
-
+// Creates the old buttons and loads the new ones.
 function progressionBarUpdate() {
-	
 	$('.mission-level').each(function() {
 		this.remove();
 	});
@@ -293,6 +349,7 @@ function progressionBarUpdate() {
 	});
 }
 
+// Auto-Indentation
 function beatify() {
     var val = editor.session.getValue();
     var array = val.split(/\n/);
@@ -304,6 +361,7 @@ function beatify() {
 }
 
 
+// When a mission is pressed in progress bar we move there.
 function progressBarPressed(bar) {
 	console.log('pressed')
 	var bar_index = bar.dataset.bar_index;
@@ -313,77 +371,46 @@ function progressBarPressed(bar) {
 }
 
 
+// Creates a new saveslot, inserts it to saveslot list and saves it.
 function saveSlotCreate() {
 	let slotList = saveSlotsLoad();
 	
 	var name = prompt("Please enter your name:", "");
-	if (name == null || name == "") {
-		name = "default";
+	if (name === null || name === '') {
+		//name = "default";
 	} else {
 		if (slotList.includes(name)) { alert('Save slot with name '+name+' already created.'); return; }
 		slotList.unshift(name);
 		
 		slotName = name;
+		
 		saveSlotsSave(slotList);
 		saveSlotsUpdateDropdown();
 		
-		localStorage.setItem('latest_slot', slotName);
+		
+		localStorage.setItem('slotName', slotName);
+		location.reload();
+		
 	}
 	
 }
 
+// Loads the list of saveslots
 function saveSlotsLoad() {
 	var slotList = localStorage.getItem('slot_list');
 	try 	{ slotList = JSON.parse(slotList); if (!slotList) throw 'no slotlist found'}
 	catch(e) { console.log('catch'); slotList = ['Default']; }
 	
-	console.log(slotList);
-	
 	return slotList;
 }
 
+// Saves the list of saveslots
 function saveSlotsSave(slotList) {
 	slotList = JSON.stringify(slotList);
 	localStorage.setItem('slot_list', slotList);
 }
 
-function slotDataInit(slotData) {
-	return {
-		mission_index: 0,
-		mission_latest_unlocked: 0
-	};
-}
-
-
-function saveSlotGet(key, def) {
-	let slotData = localStorage.getItem(slotName);
-		slotData = JSON.parse(slotData);
-	
-	//alert(typeof slotData)
-	//alert(slotData);
-	if (typeof slotData != 'object' || slotData === null) slotData = slotDataInit();
-	
-	//alert(JSON.stringify(slotData));
-	
-	console.log(slotData)
-	let value = slotData[key];
-	
-	if (value === undefined && def !== undefined) return def;
-	console.log(value);
-	return value;
-	
-}
-
-function saveSlotSet(key, value) {
-	let slotData = localStorage.getItem(slotName);
-	
-	if (typeof slotData != 'object') slotData = slotDataInit();
-	slotData[key] = value;
-	console.log(slotData)
-	localStorage.setItem(slotName, JSON.stringify(slotData));
-}
-
-
+// Updates buttons indside saveslot dropdown
 function saveSlotsUpdateDropdown() {
 	$('.slot').each(function() {
 		this.remove();
@@ -397,12 +424,20 @@ function saveSlotsUpdateDropdown() {
 	let slotList = saveSlotsLoad();
 	slotList.forEach(function(slot) {
 		let dom = dropdown.append(
-			'<a class="dropdown-item slot">'+slot+'</a>'
+			'<a class="dropdown-item slot" data-slot="'+slot+'", onclick="saveSlotSelect(this)">'+slot+'</a>'
 		);
 		dom.addClass('active');
 	})
 	dropdown.append('<a class="dropdown-item slot" onclick="saveSlotCreate()"><i>Create New</i></a>');
+};
+
+function saveSlotSelect(dom) {
+	var slotName = dom.dataset.slot;
+	localStorage.setItem('slotName', slotName);
+	location.reload();
 }
+
+
 
 /*
 Kun uusi sessio aloitetaan:

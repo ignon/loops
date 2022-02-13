@@ -6,19 +6,40 @@
 </head>
 
 
+
 <!-- js-beautify (external beautify functions to use with ace editor) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.10.0/beautify.js"></script>
 
 <!-- p5.js libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/p5.js" integrity="sha256-v7VXRjLXSQU8TLVpV3hSPIARUehQ2NNQjmcU/NHmCoo=" crossorigin="anonymous"></script>
 <script src="kirjasto.js"></script>
-<script src="tehtavat.js"></script>
+<script src="missions_fi.js"></script>
+<script src="missions_en.js"></script>
 
 <!-- Bootstrap -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+<!-- Playfab (mostly for analytics, I do not track anything personal, just user count, average missions completed etc) -->
+<!--<script type="text/javascript" src="https://download.playfab.com/PlayFabClientApi.js"></script>
+<script src="playfab.js"></script>
+
+<!-- GameAnalytics -->
+<script src="GameAnalytics.js"></script>
+
+<!--<script src='http://download.gameanalytics.com/js/GameAnalytics-2.0.1.min.js'></script>-->
+<!--
+<script>
+GameAnalytics("setEnabledInfoLog", true);
+GameAnalytics("setEnabledVerboseLog", true);
+GameAnalytics("configureBuild", "android 1.0.0");
+GameAnalytics("setGender", "'male'");
+
+GameAnalytics("initialize", "8fa42872e672824ac8497c5ea386bc80", "28310d9da3861e3772a21c73dc99129f8f1c2888");
+</script>
+-->
 
 <!-- Page stylesheet -->
 <link rel="stylesheet" href="style.css">
@@ -89,13 +110,13 @@
 								<a id="desc" onclick="changeTab('desc')" class="nav-link active tabi">Description</a>
 							</li>
 							<li class="nav-item">
-								<a data-order="1" id="hint1" onclick="changeTab('hint1')" class="nav-link active tabi hint">Hint 1</a>
+								<a data-order="1" data-hint_index="1" id="hint1" onclick="changeTab('hint1',this)" class="nav-link active tabi hint">Hint 1</a>
 							</li>
 							<li class="nav-item">
-								<a data-order="2" id="hint2" onclick="changeTab('hint2')" class="nav-link active tabi hint">Hint 2</a>
+								<a data-order="2" data-hint_index="2" id="hint2" onclick="changeTab('hint2',this)" class="nav-link active tabi hint">Hint 2</a>
 							</li>
 							<li class="nav-item">
-								<a data-order="3" id="hint3" onclick="changeTab('hint3')" class="nav-link active tabi hint">Hint 3</a>
+								<a data-order="3" data-hint_index="3" id="hint3" onclick="changeTab('hint3',this)" class="nav-link active tabi hint">Hint 3</a>
 							</li>
 						</ul>
 						
@@ -113,15 +134,8 @@
 		<br>
 		<div class="row">
 			<div class="col-sm-12 no-gutters" style="height:50px;">
-				<!--<button onclick="resetAllProgress()" class="btn btn-dark btb-lg no-gutters" style="width:200px; height:35px;">Reset progress</button>
-				<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-							<a class="dropdown-item" href="#">Action</a>
-							<a class="dropdown-item" href="#">Another action</a>
-							<a class="dropdown-item" href="#">Something else here</a>
-				</div>-->
 				
-				<div class="btn-group" role="group" aria-label="Button group with nested dropdown">
-					<!--<button type="button" onlick="resetAllProgress()" class="btn btn-dark">Reset All Progress</button>-->
+			<div class="btn-group" role="group" aria-label="Button group with nested dropdown">
 				
 				<!-- Language -->
 				<div class="btn-group" role="group">
@@ -129,27 +143,17 @@
 							Language
 						</button>
 						<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-							<a class="dropdown-item" href="#">English</a>
-							<a class="dropdown-item" href="#">Suomi</a>
+							<a class="dropdown-item" onclick="changeLanguage('en')">English</a>
+							<a class="dropdown-item" onclick="changeLanguage('fi')">Suomi</a>
 						</div>	
 				</div>
 				
-				<!-- SaveState -->
+				<!-- SaveSlots -->
 				<div class="btn-group" role="group">
-						<button id="slotsButton" type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							Save Slot
-						</button>
-						<div id='saveslots'class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-							<a class="dropdown-item slot">Create new</a>
-							<a class="dropdown-item slot active">Default</a>
-							<a class="dropdown-item slot">Jeppe</a>
-						</div>	
+						<button id="slotsButton" type="button" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Save Slot</button>
+						<div id='saveslots'class="dropdown-menu" aria-labelledby="btnGroupDrop1"></div>	
 				</div>
 		</div>
-		
-		
-		
-		
 	</div>
 	
 	<script>
@@ -163,7 +167,7 @@
 			
 			var staticWordCompleter = {
 				getCompletions: function(editor, session, pos, prefix, callback) {
-					var wordList = ["ruutu"];
+					var wordList = ["ruutu", "cell"];
 					callback(null, wordList.map(function(word) {
 						return {
 							caption: word,

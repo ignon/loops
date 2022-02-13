@@ -40,7 +40,7 @@ function cell(x, y) {
   if (x >= _cell_count) { throw "Array index x outside bounds (x is larger than the array width)"; }
   if (y >= _cell_count) throw "Array index y outside bounds (y is larger than the array height)";
   
-  _target_grid[x][y] = true;
+  if (execution_mode != EXECUTION_MODE.NORMAL) _target_grid[x][y] = true;
   
   var _w = _cell_width;
   x *= _w;
